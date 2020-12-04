@@ -39,7 +39,12 @@ class Menu
 
 
     def pull_data_by_city_and_state(city, state)
-        info = GetRequester.new("https://app.ticketmaster.com/discovery/v2/events.json?city=#{city}&stateCode=#{state}&apikey=QATrioQ3vEzlLyBebumHRHuNBfT39vrZ").parse_json
+            info = GetRequester.new("https://app.ticketmaster.com/discovery/v2/events.json?city=#{city}&stateCode=#{state}&apikey=QATrioQ3vEzlLyBebumHRHuNBfT39vrZ").parse_json
+        begin 
+            info["_embedded"]["events"]
+        rescue 
+            error_message
+        end 
     end
   
     def find_or_create_user_by(name, city, state) 
@@ -118,7 +123,22 @@ def back_to_start
 end 
 
 def end_program
-    puts "goodbye!"
+    puts "Goodbye!"
     exit 
 end 
 
+def error_message
+    puts
+    puts "No events found in your city :(" #can make this a more generic message if we want to use this error method elsewhere
+    puts  
+    puts "Press 's' to return to start"
+    puts "Press 'x' to exit the program"        
+    user_input = STDIN.gets.chomp
+    if user_input == "s"
+        back_to_start
+    elsif user_input == "x"
+        end_program
+    else
+        puts "Invalid entry, please try another option"
+    end 
+end 

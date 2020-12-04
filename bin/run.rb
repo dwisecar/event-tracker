@@ -30,6 +30,7 @@ end
 
 def load_event_details(info)   
     events = []
+    binding.pry
     info["_embedded"]["events"].each do |event|        
         new_event = Event.new
         new_event.attraction_name = event["name"]
