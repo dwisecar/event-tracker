@@ -223,40 +223,6 @@ class Menu
         exit 
     end 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
     def get_results_by_event_type
         events = Event.all.select {|event|event.event_city.split.any?(user.city.capitalize) || event.event_city.split.any?(user.city)}  
         if events.empty?
@@ -264,28 +230,35 @@ class Menu
             begin_search
         else
             i = 1
-            type_nums = {}
+            numbered_types = {}
             event_types = events.map{|event| event.event_type}.uniq
             event_types.each do |type|
-            type_nums[i] = type
+            numbered_types[i] = type
             i += 1
             end
         end 
-    
-    user_select_event_type(type_nums, events)
+    user_select_event_type(numbered_types, events)
     end 
 
-    def user_select_event_type(type_nums, events)
+    def user_select_event_type(numbered_types, events)
         puts "Please select the number of the event type you would like to see:"
-        type_nums.each {|num, type| puts "#{num}. #{type}"}
+        numbered_types.each {|num, type| puts "#{num}. #{type}"}
         #puts "Press 'a' to see all events" << functionality to be added
         puts "Press 's' to log out of the app" #to do - put these repeating phrases in a method in case we update
         puts "Press 'x' to exit the app"
         user_input = STDIN.gets.chomp.downcase
-        type_nums.each do |num, type|
-            if user_input == num.to_s
-                get_results_by_genre(type)
-            end 
+        if numbered_types[user_input.to_i]
+            type = numbered_types[user_input.to_i]
+            get_results_by_genre(type)
+        elsif user_input == "s"
+            back_to_start
+        elsif user_input == "x"
+            end_program
+        else 
+            puts
+            invalid_selection
+            puts
+            user_select_event_type(numbered_types, events)
         end
     end 
 
@@ -296,26 +269,34 @@ class Menu
             begin_search
         else
             i = 1
-            genre_nums = {}
+            numbered_genres = {}
             event_genres = events.map{|event| event.genre}.uniq
             event_genres.each do |genre|
-            genre_nums[i] = genre
+            numbered_genres[i] = genre
             i += 1
             end
-        user_display_genre(genre_nums)
+        user_select_genre(numbered_genres)
         end 
     end 
     
-    def user_display_genre(genre_nums)
-        puts "Please select the number of the genre of you would like to see:"
-        genre_nums.each {|num, genre| puts "#{num}. #{genre}"}
-        puts "Press 's' to log out of the app" #to do - put these repeating phrases in a method in case we update
+    def user_select_genre(numbered_genres)
+        puts "Please select the number of the genre you would like to see:"
+        numbered_genres.each {|num, genre| puts "#{num}. #{genre}"}
+        puts "Press 's' to log out of the app"
         puts "Press 'x' to exit the app"
         user_input = STDIN.gets.chomp.downcase
-            genre_nums.each do |num, genre|
-                if user_input == num.to_s
-                    display_genre_events(genre)
-                end 
+        if numbered_genres[user_input.to_i]
+            genre = numbered_genres[user_input.to_i]
+            display_genre_events(genre)
+        elsif user_input == "s"
+            back_to_start
+        elsif user_input == "x"
+            end_program
+        else 
+            puts
+            invalid_selection
+            puts
+            user_select_genre(numbered_genres)
             end 
         end 
 
@@ -331,65 +312,6 @@ class Menu
 
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#tester method only. to use, add call to method within normal run sequence
-def classification_tester(info)
-    info["_embedded"]["events"].each do |event|
-        puts "#{event["_embedded"]["venues"][0]["city"]["name"]} - #{event["classifications"][0]["genre"]["name"]} - #{event["classifications"][0]["segment"]["name"]}"
-    end 
-end 
 
 def error_message
     self.user.delete
